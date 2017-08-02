@@ -16,6 +16,7 @@ This meaning of each flag is transcendant to the correspondant options in the co
 - ```-l, --log``` indicates the error logger; it can be 'stdout', 'stderr' or a file path. Defaults to "stdout".
 - ```-p, --port``` is the port to listen to. Defaults 0 (random free port).
 - ```--plugin``` specifies if you want to enable a plugin.
+- ```-v, --version``` prints the version of the executable.
 
 These options are used to set the default values for new users:
 
@@ -23,6 +24,7 @@ These options are used to set the default values for new users:
 - ```--allow-edit``` is the default value for allow edit option. Defaults to true.
 - ```--allow-new``` is the default value for allow new option. Defaults to true.
 - ```--commands``` is a space separated string with the available commands for new users. Defaults to "git svn hg".
+- ```--no-auth``` disables the authentication. Using this option, the default values will be used for the permissions.
 - ```-s, --scope``` is the default scope for new users. Defaults to the working directory.
 
 So, if you wanted to run File Manager on port 80, with the database on `/etc/fm.db` and the default scope to `/data`, you would run:
@@ -40,6 +42,7 @@ Here is a specimen of a JSON configuration file:
 ```json
 {
   "port": 80,
+  "noAuth": false,
   "address": "127.0.0.1",
   "database": "/path/to/database.db",
   "log": "stdout",
@@ -59,6 +62,7 @@ In YAML:
 
 ```yaml
 port: 80
+noAuth: false
 address: 127.0.0.1
 database: "/path/to/database.db"
 log: stdout
@@ -77,6 +81,7 @@ In TOML:
 ```toml
 port = 80
 address = 127.0.0.1
+noAuth = false
 database = "/path/to/database.db"
 log = stdout
 plugin = ''
