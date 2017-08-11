@@ -15,7 +15,7 @@ This meaning of each flag is transcendant to the correspondant options in the co
 - ```-d, --database```is the path to the database file. Defaults to "./filemanager.db".
 - ```-l, --log``` indicates the error logger; it can be 'stdout', 'stderr' or a file path. Defaults to "stdout".
 - ```-p, --port``` is the port to listen to. Defaults 0 (random free port).
-- ```--plugin``` specifies if you want to enable a plugin.
+- ```--staticgen``` specifies if you want to enable a Static Website Generator (jekyll and hugo are available).
 - ```-v, --version``` prints the version of the executable.
 
 These options are used to set the default values for new users:
