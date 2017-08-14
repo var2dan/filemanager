@@ -29,3 +29,5 @@ docs:
             url: /installation/#docker
       - page: Configuration
         url: /configuration/
+      - page: Caddy Plugins
+        url: /caddy/

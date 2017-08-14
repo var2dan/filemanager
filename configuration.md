@@ -33,6 +33,16 @@ So, if you wanted to run File Manager on port 80, with the database on `/etc/fm.
 filemanager --port 80 --database /etc/fm.db --scope /data
 ```
 
+### Available Locales
+
+Right now, File Manager is available in the following languages:
+
+- `en` - English
+- `pt` - Portuguese
+- `jp` - Japanese
+- `zh-cn` - Chinese (Simplified)
+- `zh-tw` - Chinese (Traditional)
+
 ## Configuration File
 
 By default, File Manager will try to find a file named "filemanager.yaml", "filemanager.toml" or "filemanager.json" on the current working directory to use as its configuration file. If you want to use another file, you only need to specify the `-c` flag with its path.
