@@ -11,6 +11,7 @@ File Manager can work either via a command line interface, with flags, or throug
 This meaning of each flag is transcendant to the correspondant options in the configuration files. Here are the configurations to the **File Manager itself**:
 
 - ```-a, --address``` is the address to listen to. Defaults to "" (empty string, all of the addresses).
+- ```-b, --baseurl``` is the baseURL where File Manager will be available at.
 - ```-c, --config``` specifies a configuration file.
 - ```-d, --database```is the path to the database file. Defaults to "./filemanager.db".
 - ```-l, --log``` indicates the error logger; it can be 'stdout', 'stderr' or a file path. Defaults to "stdout".
