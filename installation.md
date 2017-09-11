@@ -66,8 +66,8 @@ Using the configuration file:
 ```shell
 docker run \
     -v /path/to/sites/root:/srv \
-    -v /path/to/config.json:/etc/config.json \
-    -v /path/to/database.db:/etc/database.db \
+    -v /path/to/config.json:/config.json \
+    -v /path/to/database.db:/database.db \
     -p 80:80 \
     hacdias/filemanager
 ```
@@ -77,11 +77,11 @@ Using command line arguments:
 ```shell
 docker run \
     -v /path/to/sites/root:/srv \
-    -v /path/to/database.db:/etc/database.db \
+    -v /path/to/database.db:/database.db \
     -p 80:80 \
     hacdias/filemanager
     --port 80
-    --database /etc/database.db
+    --database /database.db
     --scope /srv
     --other-flag other-value
 ```
