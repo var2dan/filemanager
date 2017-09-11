@@ -18,6 +18,8 @@ This meaning of each flag is transcendant to the correspondant options in the co
 - ```-p, --port``` is the port to listen to. Defaults 0 (random free port).
 - ```--staticgen``` specifies if you want to enable a Static Website Generator (jekyll and hugo are available).
 - ```-v, --version``` prints the version of the executable.
+- ```--recaptcha-key``` is the ReCAPTCHA site key. Enables ReCAPTCHA on login.
+- ```--recaptcha-secret``` is the ReCAPTCHA secret key. Enables ReCAPTCHA on login.
 
 These options are used to set the default values for new users:
 
@@ -54,7 +56,10 @@ Here is a specimen of a JSON configuration file:
 {
   "port": 80,
   "noAuth": false,
+  "baseURL": "/admin",
   "address": "127.0.0.1",
+  "reCaptchaKey": "",
+  "reCaptchaSecret": "",
   "database": "/path/to/database.db",
   "log": "stdout",
   "plugin": "",
@@ -73,8 +78,11 @@ In YAML:
 
 ```yaml
 port: 80
+baseURL: /admin
 noAuth: false
 address: 127.0.0.1
+reCaptchaKey: ''
+reCaptchaSecret: ''
 database: "/path/to/database.db"
 log: stdout
 plugin: ''
@@ -91,8 +99,11 @@ In TOML:
 
 ```toml
 port = 80
+baseURL = /admin
 address = 127.0.0.1
 noAuth = false
+reCaptchaKey = ''
+reCaptchaSecret = ''
 database = "/path/to/database.db"
 log = stdout
 plugin = ''
