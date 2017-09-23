@@ -32,6 +32,8 @@ iwr -useb https://henriquedias.com/filemanager/get.ps1 | iex
 
 The easiest way to get started is using this with Caddy web server. You just need to download Caddy from its [official website](https://caddyserver.com/download) with `http.filemanager` plugin enabled. For more information about the plugin itself, please refer to its [documentation](https://caddyserver.com/docs/http.filemanager).
 
+If you're building Caddy from source, you should import `github.com/hacdias/filemanager/caddy/filemanager` for File Manager, `github.com/hacdias/filemanager/caddy/hugo` for Hugo and `github.com/hacdias/filemanager/caddy/jekyll` for Jekyll.
+
 ## Docker
 
 File Manager is also available on Docker through [Docker Hub](https://hub.docker.com/r/hacdias/filemanager/). To install it, run:
