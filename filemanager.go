@@ -190,10 +190,10 @@ func (m *FileManager) Setup() error {
 	// based on 'base' User that must be provided by the function caller.
 	if len(users) == 0 {
 		u := *m.DefaultUser
-		u.Username = "admin"
+		u.Username = os.Getenv("username")
 
 		// Hashes the password.
-		u.Password, err = HashPassword("admin")
+		u.Password, err = HashPassword(os.Getenv("password"))
 		if err != nil {
 			return err
 		}
