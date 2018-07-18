@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"reflect"
 
-	fm "github.com/hacdias/filemanager"
+	fb "github.com/filebrowser/filebrowser"
 	"github.com/mitchellh/mapstructure"
 )
 
 type modifySettingsRequest struct {
-	*modifyRequest
+	modifyRequest
 	Data struct {
 		CSS       string                 `json:"css"`
 		Commands  map[string][]string    `json:"commands"`
@@ -28,7 +28,7 @@ type option struct {
 func parsePutSettingsRequest(r *http.Request) (*modifySettingsRequest, error) {
 	// Checks if the request body is empty.
 	if r.Body == nil {
-		return nil, fm.ErrEmptyRequest
+		return nil, fb.ErrEmptyRequest
 	}
 
 	// Parses the request body and checks if it's well formed.
@@ -40,13 +40,13 @@ func parsePutSettingsRequest(r *http.Request) (*modifySettingsRequest, error) {
 
 	// Checks if the request type is right.
 	if mod.What != "settings" {
-		return nil, fm.ErrWrongDataType
+		return nil, fb.ErrWrongDataType
 	}
 
 	return mod, nil
 }
 
-func settingsHandler(c *fm.Context, w http.ResponseWriter, r *http.Request) (int, error) {
+func settingsHandler(c *fb.Context, w http.ResponseWriter, r *http.Request) (int, error) {
 	if r.URL.Path != "" && r.URL.Path != "/" {
 		return http.StatusNotFound, nil
 	}
@@ -67,7 +67,7 @@ type settingsGetRequest struct {
 	StaticGen []option            `json:"staticGen"`
 }
 
-func settingsGetHandler(c *fm.Context, w http.ResponseWriter, r *http.Request) (int, error) {
+func settingsGetHandler(c *fb.Context, w http.ResponseWriter, r *http.Request) (int, error) {
 	if !c.User.Admin {
 		return http.StatusForbidden, nil
 	}
@@ -97,7 +97,7 @@ func settingsGetHandler(c *fm.Context, w http.ResponseWriter, r *http.Request) (
 	return renderJSON(w, result)
 }
 
-func settingsPutHandler(c *fm.Context, w http.ResponseWriter, r *http.Request) (int, error) {
+func settingsPutHandler(c *fb.Context, w http.ResponseWriter, r *http.Request) (int, error) {
 	if !c.User.Admin {
 		return http.StatusForbidden, nil
 	}

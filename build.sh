@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Install rice tool if not present
 if ! [ -x "$(command -v rice)" ]; then
@@ -6,8 +7,8 @@ if ! [ -x "$(command -v rice)" ]; then
 fi
 
 # Clean the dist folder and build the assets
-rm -rf assets/dist
-npm run build
+rm -rf node_modules
+npm install
 
 # Embed the assets using rice
 rice embed-go

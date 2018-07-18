@@ -1,6 +1,6 @@
 build:
-  main: cmd/filemanager/main.go
-  binary: filemanager
+  main: cmd/filebrowser/main.go
+  binary: filebrowser
   goos:
     - darwin
     - linux
@@ -8,21 +8,31 @@ build:
     - freebsd
     - netbsd
     - openbsd
+    - dragonfly
+    - solaris
   goarch:
     - amd64
     - 386
     - arm
     - arm64
+  goarm:
+    - 5
+    - 6
+    - 7
   ignore:
+    - goos: darwin
+      goarch: 386
     - goos: openbsd
       goarch: arm
-      goarm: 6
     - goos: freebsd
       goarch: arm
-      goarm: 6
+    - goos: netbsd
+      goarch: arm
+    - goos: solaris
+      goarch: arm
 
 archive:
-  name_template: "{{.Os}}-{{.Arch}}-{{ .ProjectName }}"
+  name_template: "{{.Os}}-{{.Arch}}{{if .Arm}}v{{.Arm}}{{end}}-{{ .ProjectName }}"
   format: tar.gz
   format_overrides:
     - goos: windows

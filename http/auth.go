@@ -9,10 +9,10 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
-	fm "github.com/hacdias/filemanager"
+	fb "github.com/filebrowser/filebrowser"
 )
 
-const reCaptchaAPI = "https://www.google.com/recaptcha/api/siteverify"
+const reCaptchaAPI = "/recaptcha/api/siteverify"
 
 type cred struct {
 	Password  string `json:"password"`
@@ -21,14 +21,14 @@ type cred struct {
 }
 
 // reCaptcha checks the reCaptcha code.
-func reCaptcha(secret string, response string) (bool, error) {
+func reCaptcha(host, secret, response string) (bool, error) {
 	body := url.Values{}
 	body.Set("secret", secret)
 	body.Add("response", response)
 
 	client := &http.Client{}
 
-	resp, err := client.Post(reCaptchaAPI, "application/x-www-form-urlencoded", strings.NewReader(body.Encode()))
+	resp, err := client.Post(host+reCaptchaAPI, "application/x-www-form-urlencoded", strings.NewReader(body.Encode()))
 	if err != nil {
 		return false, err
 	}
@@ -38,10 +38,7 @@ func reCaptcha(secret string, response string) (bool, error) {
 	}
 
 	var data struct {
-		Success     bool        `json:"success"`
-		ChallengeTS time.Time   `json:"challenge_ts"`
-		Hostname    string      `json:"hostname"`
-		ErrorCodes  interface{} `json:"error-codes"`
+		Success bool `json:"success"`
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&data)
@@ -53,7 +50,7 @@ func reCaptcha(secret string, response string) (bool, error) {
 }
 
 // authHandler processes the authentication for the user.
-func authHandler(c *fm.Context, w http.ResponseWriter, r *http.Request) (int, error) {
+func authHandler(c *fb.Context, w http.ResponseWriter, r *http.Request) (int, error) {
 	// NoAuth instances shouldn't call this method.
 	if c.NoAuth {
 		return 0, nil
@@ -72,7 +69,7 @@ func authHandler(c *fm.Context, w http.ResponseWriter, r *http.Request) (int, er
 
 	// If ReCaptcha is enabled, check the code.
 	if len(c.ReCaptchaSecret) > 0 {
-		ok, err := reCaptcha(c.ReCaptchaSecret, cred.ReCaptcha)
+		ok, err := reCaptcha(c.ReCaptchaHost, c.ReCaptchaSecret, cred.ReCaptcha)
 		if err != nil {
 			return http.StatusForbidden, err
 		}
@@ -89,7 +86,7 @@ func authHandler(c *fm.Context, w http.ResponseWriter, r *http.Request) (int, er
 	}
 
 	// Checks if the password is correct.
-	if !fm.CheckPasswordHash(cred.Password, u.Password) {
+	if !fb.CheckPasswordHash(cred.Password, u.Password) {
 		return http.StatusForbidden, nil
 	}
 
@@ -99,7 +96,7 @@ func authHandler(c *fm.Context, w http.ResponseWriter, r *http.Request) (int, er
 
 // renewAuthHandler is used when the front-end already has a JWT token
 // and is checking if it is up to date. If so, updates its info.
-func renewAuthHandler(c *fm.Context, w http.ResponseWriter, r *http.Request) (int, error) {
+func renewAuthHandler(c *fb.Context, w http.ResponseWriter, r *http.Request) (int, error) {
 	ok, u := validateAuth(c, r)
 	if !ok {
 		return http.StatusForbidden, nil
@@ -111,15 +108,15 @@ func renewAuthHandler(c *fm.Context, w http.ResponseWriter, r *http.Request) (in
 
 // claims is the JWT claims.
 type claims struct {
-	fm.User
+	fb.User
 	jwt.StandardClaims
 }
 
 // printToken prints the final JWT token to the user.
-func printToken(c *fm.Context, w http.ResponseWriter) (int, error) {
+func printToken(c *fb.Context, w http.ResponseWriter) (int, error) {
 	// Creates a copy of the user and removes it password
 	// hash so it never arrives to the user.
-	u := fm.User{}
+	u := fb.User{}
 	u = *c.User
 	u.Password = ""
 
@@ -128,7 +125,7 @@ func printToken(c *fm.Context, w http.ResponseWriter) (int, error) {
 		u,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
-			Issuer:    "File Manager",
+			Issuer:    "File Browser",
 		},
 	}
 
@@ -168,7 +165,7 @@ func (e extractor) ExtractToken(r *http.Request) (string, error) {
 
 // validateAuth is used to validate the authentication and returns the
 // User if it is valid.
-func validateAuth(c *fm.Context, r *http.Request) (bool, *fm.User) {
+func validateAuth(c *fb.Context, r *http.Request) (bool, *fb.User) {
 	if c.NoAuth {
 		c.User = c.DefaultUser
 		return true, c.User
