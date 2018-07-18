@@ -1,4 +1,4 @@
-package filemanager
+package filebrowser
 
 import (
 	"bytes"
@@ -71,7 +71,7 @@ type Listing struct {
 
 // GetInfo gets the file information and, in case of error, returns the
 // respective HTTP error code
-func GetInfo(url *url.URL, c *FileManager, u *User) (*File, error) {
+func GetInfo(url *url.URL, c *FileBrowser, u *User) (*File, error) {
 	var err error
 
 	i := &File{
@@ -134,13 +134,12 @@ func (i *File) GetListing(u *User, r *http.Request) error {
 		}
 
 		if strings.HasPrefix(f.Mode().String(), "L") {
-			// It's a symbolic link
-			// The FileInfo from Readdir treats symbolic link as a file only.
+			// It's a symbolic link. We try to follow it. If it doesn't work,
+			// we stay with the link information instead if the target's.
 			info, err := os.Stat(f.Name())
-			if err != nil {
-				return err
+			if err == nil {
+				f = info
 			}
-			f = info
 		}
 
 		if f.IsDir() {

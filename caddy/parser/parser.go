@@ -11,9 +11,9 @@ import (
 	"strings"
 
 	"github.com/asdine/storm"
-	"github.com/hacdias/filemanager"
-	"github.com/hacdias/filemanager/bolt"
-	"github.com/hacdias/filemanager/staticgen"
+	"github.com/filebrowser/filebrowser"
+	"github.com/filebrowser/filebrowser/bolt"
+	"github.com/filebrowser/filebrowser/staticgen"
 	"github.com/hacdias/fileutils"
 	"github.com/mholt/caddy"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
@@ -22,14 +22,14 @@ import (
 var databases = map[string]*storm.DB{}
 
 // Parse ...
-func Parse(c *caddy.Controller, plugin string) ([]*filemanager.FileManager, error) {
+func Parse(c *caddy.Controller, plugin string) ([]*filebrowser.FileBrowser, error) {
 	var (
-		configs []*filemanager.FileManager
+		configs []*filebrowser.FileBrowser
 		err     error
 	)
 
 	for c.Next() {
-		u := &filemanager.User{
+		u := &filebrowser.User{
 			Locale:        "en",
 			AllowCommands: true,
 			AllowEdit:     true,
@@ -37,17 +37,15 @@ func Parse(c *caddy.Controller, plugin string) ([]*filemanager.FileManager, erro
 			AllowPublish:  true,
 			Commands:      []string{"git", "svn", "hg"},
 			CSS:           "",
-			Rules: []*filemanager.Rule{{
-				Regex:  true,
-				Allow:  false,
-				Regexp: &filemanager.Regexp{Raw: "\\/\\..+"},
-			}},
+			ViewMode:      "mosaic",
+			Rules:         []*filebrowser.Rule{},
 		}
 
 		baseURL := "/"
 		scope := "."
 		database := ""
 		noAuth := false
+		alterRecaptcha := false
 		reCaptchaKey := ""
 		reCaptchaSecret := ""
 
@@ -154,8 +152,18 @@ func Parse(c *caddy.Controller, plugin string) ([]*filemanager.FileManager, erro
 				}
 
 				u.ViewMode = c.Val()
-				if u.ViewMode != filemanager.MosaicViewMode && u.ViewMode != filemanager.ListViewMode {
+				if u.ViewMode != filebrowser.MosaicViewMode && u.ViewMode != filebrowser.ListViewMode {
 					return nil, c.ArgErr()
+				}
+			case "alternative_recaptcha":
+				if !c.NextArg() {
+					alterRecaptcha = true
+					continue
+				}
+
+				alterRecaptcha, err = strconv.ParseBool(c.Val())
+				if err != nil {
+					return nil, err
 				}
 			case "recaptcha_key":
 				if !c.NextArg() {
@@ -226,19 +234,25 @@ func Parse(c *caddy.Controller, plugin string) ([]*filemanager.FileManager, erro
 			return nil, err
 		}
 
-		m := &filemanager.FileManager{
+		recaptchaHost := "https://www.google.com"
+		if alterRecaptcha {
+			recaptchaHost = "https://recaptcha.net"
+		}
+
+		m := &filebrowser.FileBrowser{
 			NoAuth:          noAuth,
 			BaseURL:         "",
 			PrefixURL:       "",
+			ReCaptchaHost:   recaptchaHost,
 			ReCaptchaKey:    reCaptchaKey,
 			ReCaptchaSecret: reCaptchaSecret,
 			DefaultUser:     u,
-			Store: &filemanager.Store{
+			Store: &filebrowser.Store{
 				Config: bolt.ConfigStore{DB: db},
 				Users:  bolt.UsersStore{DB: db},
 				Share:  bolt.ShareStore{DB: db},
 			},
-			NewFS: func(scope string) filemanager.FileSystem {
+			NewFS: func(scope string) filebrowser.FileSystem {
 				return fileutils.Dir(scope)
 			},
 		}

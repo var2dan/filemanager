@@ -1,14 +1,11 @@
-// Package filemanager provides middleware for managing files in a directory
-// when directory path is requested instead of a specific file. Based on browse
-// middleware.
 package filemanager
 
 import (
 	"net/http"
 
-	"github.com/hacdias/filemanager"
-	"github.com/hacdias/filemanager/caddy/parser"
-	h "github.com/hacdias/filemanager/http"
+	"github.com/filebrowser/filebrowser"
+	"github.com/filebrowser/filebrowser/caddy/parser"
+	h "github.com/filebrowser/filebrowser/http"
 	"github.com/mholt/caddy"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
 )
@@ -22,7 +19,7 @@ func init() {
 
 type plugin struct {
 	Next    httpserver.Handler
-	Configs []*filemanager.FileManager
+	Configs []*filebrowser.FileBrowser
 }
 
 // ServeHTTP determines if the request is for this plugin, and if all prerequisites are met.

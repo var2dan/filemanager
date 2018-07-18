@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	fm "github.com/hacdias/filemanager"
+	fb "github.com/filebrowser/filebrowser"
 	"github.com/hacdias/varutils"
 )
 
@@ -64,7 +64,7 @@ func (h Hugo) Name() string {
 }
 
 // Hook is the pre-api handler.
-func (h Hugo) Hook(c *fm.Context, w http.ResponseWriter, r *http.Request) (int, error) {
+func (h Hugo) Hook(c *fb.Context, w http.ResponseWriter, r *http.Request) (int, error) {
 	// If we are not using HTTP Post, we shall return Method Not Allowed
 	// since we are only working with this method.
 	if r.Method != http.MethodPost {
@@ -84,7 +84,8 @@ func (h Hugo) Hook(c *fm.Context, w http.ResponseWriter, r *http.Request) (int, 
 		return http.StatusForbidden, nil
 	}
 
-	filename := filepath.Join(c.User.Scope, r.URL.Path)
+	filename := filepath.Clean(r.URL.Path)
+	filename = strings.TrimPrefix(filename, string(filepath.Separator))
 	archetype := r.Header.Get("archetype")
 
 	ext := filepath.Ext(filename)
@@ -107,7 +108,7 @@ func (h Hugo) Hook(c *fm.Context, w http.ResponseWriter, r *http.Request) (int, 
 }
 
 // Publish publishes a post.
-func (h Hugo) Publish(c *fm.Context, w http.ResponseWriter, r *http.Request) (int, error) {
+func (h Hugo) Publish(c *fb.Context, w http.ResponseWriter, r *http.Request) (int, error) {
 	filename := filepath.Join(c.User.Scope, r.URL.Path)
 
 	// We only run undraft command if it is a file.
@@ -124,7 +125,7 @@ func (h Hugo) Publish(c *fm.Context, w http.ResponseWriter, r *http.Request) (in
 }
 
 // Preview handles the preview path.
-func (h *Hugo) Preview(c *fm.Context, w http.ResponseWriter, r *http.Request) (int, error) {
+func (h *Hugo) Preview(c *fb.Context, w http.ResponseWriter, r *http.Request) (int, error) {
 	// Get a new temporary path if there is none.
 	if h.previewPath == "" {
 		path, err := ioutil.TempDir("", "")
